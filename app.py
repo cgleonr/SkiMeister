@@ -4,15 +4,48 @@ SkiMeister Flask API
 from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from geopy.distance import geodesic
+from geopy.geocoders import Nominatim
 from sqlalchemy import or_
 import config
 from database import get_session, init_db
 from models import Resort, Conditions, Pricing
+from seed_database import seed_database
 
 
 app = Flask(__name__)
 app.config.from_object(config)
 CORS(app)
+
+# Initialize geocoder
+geolocator = Nominatim(user_agent="SkiMeister_App")
+
+
+# Helper functions
+def get_country_from_coords(lat, lng):
+    """Reverse geocode to find country name"""
+    try:
+        location = geolocator.reverse((lat, lng), language='en')
+        if location and 'address' in location.raw:
+            return location.raw['address'].get('country')
+    except Exception as e:
+        print(f"Geocoding error: {e}")
+    return None
+
+
+def ensure_country_data(country_name):
+    """Trigger scraper if no data for country exists"""
+    if not country_name:
+        return
+        
+    session = get_session()
+    try:
+        count = session.query(Resort).filter(Resort.country == country_name).count()
+        if count == 0:
+            print(f"Data for {country_name} missing. Triggering full country scrape...")
+            # Doing this synchronously will be slow for large countries
+            seed_database(country=country_name)
+    finally:
+        session.close()
 
 
 # Helper functions
@@ -65,13 +98,17 @@ def index():
 @app.route('/api/resorts', methods=['GET'])
 def get_all_resorts():
     """Get all resorts with optional filters"""
+    # Apply filters from query params
+    filters = request.args.to_dict()
+    
+    # If a specific country is requested, ensure we have data for it
+    if 'country' in filters:
+        ensure_country_data(filters['country'])
+        
     session = get_session()
     
     try:
         query = session.query(Resort)
-        
-        # Apply filters from query params
-        filters = request.args.to_dict()
         query = apply_filters(query, filters)
         
         resorts = query.all()
@@ -117,6 +154,14 @@ def search_resorts():
                 'error': 'Missing lat or lng parameters'
             }), 400
         
+        # Determine country and ensure data exists
+        country = request.args.get('country')
+        if not country:
+            country = get_country_from_coords(lat, lng)
+            
+        if country:
+            ensure_country_data(country)
+            
         # Get radius
         radius = request.args.get('radius', config.DEFAULT_SEARCH_RADIUS_KM, type=float)
         radius = min(radius, config.MAX_SEARCH_RADIUS_KM)
@@ -156,6 +201,7 @@ def search_resorts():
             'success': True,
             'count': len(nearby_resorts),
             'user_location': {'lat': lat, 'lng': lng},
+            'country': country,
             'radius_km': radius,
             'resorts': nearby_resorts
         })

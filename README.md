@@ -10,9 +10,10 @@ A modern web application to find nearby ski resorts with real-time snow conditio
 
 - 📍 **Geolocation-based search** - Automatically find ski resorts near you
 - ❄️ **Real-time conditions** - Snow depth, fresh snowfall, temperature, wind speed
+- 📅 **7-Day Forecast** - Weather and snow predictions for every resort
 - 🎿 **Advanced filtering** - Filter by distance, snow conditions, price, open slopes
 - 💰 **Price comparison** - Compare day pass prices across resorts
-- 🌐 **Worldwide coverage** - Starting with Swiss Alps, expandable to all regions
+- 🌐 **Global Coverage** - On-demand scraping for many European countries
 - ⚡ **Fast local database** - SQLite for quick access to cached resort data
 - 🎨 **Premium UI** - Modern dark theme with glassmorphism and smooth animations
 
@@ -67,9 +68,12 @@ A modern web application to find nearby ski resorts with real-time snow conditio
 
 5. **Initialize and seed the database:**
    ```bash
-   python seed_database.py
+   python seed_database.py all Switzerland
    ```
-   This will create the SQLite database and populate it with sample Swiss resort data.
+   This will create the SQLite database and populate it with **all** resorts in Switzerland. You can replace "Switzerland" with other countries like "Austria", "Germany", "France", "Italy", or "Slovenia".
+
+   > [!NOTE]
+   > Full country scrapes can take several minutes to respect rate limits.
 
 ## Usage
 

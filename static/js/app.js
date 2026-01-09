@@ -35,8 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStats();
 });
 
+const countrySelect = document.getElementById('country-select');
+
 /**
- * Update stats from API
+ * Update stats and populate country dropdown
  */
 async function updateStats() {
     try {
@@ -44,9 +46,32 @@ async function updateStats() {
         const data = await response.json();
         if (data.success) {
             totalResortsEl.textContent = data.stats.total_resorts;
+            populateCountryDropdown(data.stats.countries);
         }
     } catch (error) {
         console.error('Error fetching stats:', error);
+    }
+}
+
+/**
+ * Populate country dropdown with available countries
+ */
+function populateCountryDropdown(countries) {
+    if (!countries || countries.length === 0) {
+        countrySelect.innerHTML = '<option value="">No countries found</option>';
+        return;
+    }
+
+    const currentCountry = filters.country;
+    countrySelect.innerHTML = countries
+        .sort()
+        .map(country => `<option value="${country}" ${country === currentCountry ? 'selected' : ''}>${country}</option>`)
+        .join('');
+
+    // If no country was selected but we have countries, pick the first one
+    if (!filters.country && countries.length > 0) {
+        filters.country = countries[0];
+        searchNearbyResorts();
     }
 }
 
@@ -88,9 +113,13 @@ async function searchNearbyResorts() {
     try {
         const params = new URLSearchParams({
             radius: filters.radius,
-            sort: filters.sort,
-            country: filters.country
+            sort: filters.sort
         });
+
+        // Only add country if it's explicitly selected or if we don't have location
+        if (filters.country) {
+            params.append('country', filters.country);
+        }
 
         if (userLocation) {
             params.append('lat', userLocation.lat);
@@ -108,6 +137,7 @@ async function searchNearbyResorts() {
             params.append('min_slopes', filters.minSlopes);
         }
 
+        // Use /search if we have location, else /resorts
         const endpoint = userLocation ? `${API_BASE}/search` : `${API_BASE}/resorts`;
         const response = await fetch(`${endpoint}?${params}`);
         const data = await response.json();
@@ -115,6 +145,12 @@ async function searchNearbyResorts() {
         if (data.success) {
             allResorts = data.resorts;
             nearbyCountEl.textContent = data.count;
+
+            // If the API returned a country (via reverse geocode), update our filter
+            if (data.country && !filters.country) {
+                updateCountryFilter(data.country);
+            }
+
             renderResorts(data.resorts);
         } else {
             console.error('API error:', data.error);
@@ -123,6 +159,24 @@ async function searchNearbyResorts() {
     } catch (error) {
         console.error('Fetch error:', error);
         showEmptyState();
+    }
+}
+
+/**
+ * Helper to update country filter UI
+ */
+function updateCountryFilter(country) {
+    filters.country = country;
+    if (countrySelect) {
+        // Add the country to the dropdown if it's not there
+        const exists = Array.from(countrySelect.options).some(opt => opt.value === country);
+        if (!exists) {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countrySelect.appendChild(option);
+        }
+        countrySelect.value = country;
     }
 }
 
@@ -271,14 +325,10 @@ function setupEventListeners() {
         });
     });
 
-    // Country buttons
-    document.querySelectorAll('.country-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.country-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            filters.country = e.target.dataset.country;
-            searchNearbyResorts();
-        });
+    // Country selection change
+    countrySelect.addEventListener('change', (e) => {
+        filters.country = e.target.value;
+        searchNearbyResorts();
     });
 
     // Modal close

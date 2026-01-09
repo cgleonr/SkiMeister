@@ -26,7 +26,10 @@
     <!-- Header -->
     <header>
         <div class="header-content">
-            <h1 class="logo">SkiMeister</h1>
+            <div class="logo-container">
+                <h1 class="logo">SkiMeister</h1>
+                <span class="powered-by">powered by bergfex</span>
+            </div>
             <div class="stats">
                 <div class="stat-item">
                     <span class="stat-value" id="total-resorts">0</span>
@@ -86,14 +89,10 @@
 
             <!-- Country Selection -->
             <div class="country-selection">
-                <span style="color: var(--text-secondary); font-weight: 600; margin-right: 0.5rem;">🌍 Country:</span>
-                <div class="country-btns">
-                    <button class="country-btn active" data-country="Switzerland">🇨🇭 CH</button>
-                    <button class="country-btn" data-country="Austria">🇦🇹 AT</button>
-                    <button class="country-btn" data-country="France">🇫🇷 FR</button>
-                    <button class="country-btn" data-country="Italy">🇮🇹 IT</button>
-                    <button class="country-btn" data-country="Germany">🇩🇪 DE</button>
-                </div>
+                <label for="country-select" style="color: var(--text-secondary); font-weight: 600;">🌍 Country:</label>
+                <select id="country-select" class="filter-select">
+                    <option value="">Detecting...</option>
+                </select>
             </div>
 
             <!-- Sort Controls -->
@@ -134,6 +133,14 @@
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2026 SkiMeister</p>
+            <p class="powered-by">powered by bergfex</p>
+        </div>
+    </footer>
 
     <!-- JavaScript -->
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>

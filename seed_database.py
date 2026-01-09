@@ -83,7 +83,7 @@ def add_resort_to_db(session, resort_data):
     return resort
 
 
-def seed_database(limit=20, country='schweiz'):
+def seed_database(limit=None, country='switzerland'):
     """Seed the database with real resort data"""
     init_db()
     session = get_session()
@@ -92,10 +92,17 @@ def seed_database(limit=20, country='schweiz'):
     try:
         print(f"Fetching resort list for {country}...")
         resort_list = scraper.get_resort_list(country)
-        print(f"Found {len(resort_list)} resorts. Scraping top {limit}...")
+        
+        if not resort_list:
+            print(f"No resorts found for {country}.")
+            return 0
+            
+        # If limit is None, scrape all resorts
+        scrape_limit = limit if limit is not None else len(resort_list)
+        print(f"Found {len(resort_list)} resorts. Scraping top {scrape_limit}...")
         
         count = 0
-        for r_info in resort_list[:limit]:
+        for r_info in resort_list[:scrape_limit]:
             print(f"Scraping details for {r_info['name']}...")
             resort_data = scraper.scrape_resort(r_info['url'])
             if resort_data:
@@ -109,10 +116,12 @@ def seed_database(limit=20, country='schweiz'):
             
         session.commit()
         print(f"\n✓ Successfully seeded/updated {count} resorts!")
+        return count
         
     except Exception as e:
         session.rollback()
         print(f"Error seeding database: {e}")
+        return 0
     finally:
         session.close()
 
@@ -120,6 +129,7 @@ def seed_database(limit=20, country='schweiz'):
 if __name__ == '__main__':
     # Use a small limit for testing, or increase for full country
     import sys
-    limit = int(sys.argv[1]) if len(sys.argv) > 1 else 10
-    country = sys.argv[2] if len(sys.argv) > 2 else 'schweiz'
+    limit_arg = sys.argv[1] if len(sys.argv) > 1 else None
+    limit = int(limit_arg) if limit_arg and limit_arg.isdigit() else None
+    country = sys.argv[2] if len(sys.argv) > 2 else 'switzerland'
     seed_database(limit=limit, country=country)

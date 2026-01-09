@@ -30,8 +30,10 @@ class BaseScraper:
         self.last_request_time = time.time()
     
     def _get_cache_path(self, key):
-        """Get cache file path for a given key"""
-        return os.path.join(config.CACHE_DIR, f"{key}.json")
+        """Get cache file path for a given key (URL), hashed for safety"""
+        import hashlib
+        hashed_key = hashlib.md5(key.encode('utf-8')).hexdigest()
+        return os.path.join(config.CACHE_DIR, f"{hashed_key}.json")
     
     def _get_cached(self, key):
         """Get cached data if not expired"""

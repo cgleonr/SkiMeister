@@ -7,7 +7,7 @@
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
-    
+
     /* Neutrals */
     --bg-primary: #0f172a;
     --bg-secondary: #1e293b;
@@ -15,30 +15,30 @@
     --text-primary: #f1f5f9;
     --text-secondary: #cbd5e1;
     --text-muted: #94a3b8;
-    
+
     /* Glass effect */
     --glass-bg: rgba(30, 41, 59, 0.7);
     --glass-border: rgba(148, 163, 184, 0.1);
-    
+
     /* Spacing */
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
     --spacing-md: 1.5rem;
     --spacing-lg: 2rem;
     --spacing-xl: 3rem;
-    
+
     /* Border radius */
     --radius-sm: 0.5rem;
     --radius-md: 1rem;
     --radius-lg: 1.5rem;
     --radius-full: 9999px;
-    
+
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-    
+
     /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -68,7 +68,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
     pointer-events: none;
@@ -94,6 +94,11 @@ header {
     justify-content: space-between;
 }
 
+.logo-container {
+    display: flex;
+    flex-direction: column;
+}
+
 .logo {
     display: flex;
     align-items: center;
@@ -104,12 +109,24 @@ header {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    line-height: 1;
 }
 
 .logo::before {
     content: '🎿';
     font-size: 2rem;
     filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
+}
+
+.powered-by {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 2px;
+    margin-left: calc(2rem + var(--spacing-sm));
+    /* Align with text after ski icon */
 }
 
 .stats {
@@ -181,6 +198,7 @@ header {
     border-radius: var(--radius-full);
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .filter-group input[type="range"]::-webkit-slider-thumb {
@@ -269,7 +287,9 @@ header {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Resort grid */
@@ -465,16 +485,16 @@ header {
         flex-direction: column;
         gap: var(--spacing-md);
     }
-    
+
     .stats {
         width: 100%;
         justify-content: space-around;
     }
-    
+
     .filter-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .resorts-grid {
         grid-template-columns: 1fr;
     }
@@ -486,6 +506,7 @@ header {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -503,33 +524,28 @@ header {
     border-top: 1px solid var(--glass-border);
 }
 
-.country-btns {
-    display: flex;
-    gap: var(--spacing-xs);
-    flex-wrap: wrap;
-}
-
-.country-btn {
-    padding: 0.35rem 0.75rem;
+.filter-select {
+    padding: var(--spacing-xs) var(--spacing-md);
     background: var(--bg-tertiary);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
-    color: var(--text-secondary);
-    font-size: 0.8125rem;
+    color: var(--text-primary);
+    font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-base);
+    outline: none;
+    min-width: 150px;
 }
 
-.country-btn:hover {
-    background: var(--bg-secondary);
+.filter-select:focus {
     border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.country-btn.active {
-    background: var(--primary-light);
-    color: white;
-    border-color: transparent;
+.filter-select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 /* Modal */
@@ -660,4 +676,18 @@ header {
         padding: var(--spacing-md);
         margin: 10% auto;
     }
+}
+
+/* Footer */
+footer {
+    padding: var(--spacing-xl) var(--spacing-lg);
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--glass-border);
+    text-align: center;
+    margin-top: var(--spacing-xl);
+}
+
+.footer-content .powered-by {
+    margin-left: 0;
+    margin-top: var(--spacing-xs);
 }

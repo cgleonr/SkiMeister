@@ -2,7 +2,9 @@
 Bergfex scraper for ski resort data
 """
 import re
-from scrapers.base_scraper import BaseScraper
+import os
+from .base_scraper import BaseScraper
+from .weather_service import WeatherService
 
 
 class BergfexScraper(BaseScraper):
@@ -10,12 +12,26 @@ class BergfexScraper(BaseScraper):
     
     BASE_URL = "https://www.bergfex.com"
     
-    def get_resort_list(self, country='schweiz'):
+    def __init__(self):
+        super().__init__()
+        self.weather_service = WeatherService()
+    
+    # Mapping English country names to Bergfex URL slugs (often German)
+    COUNTRY_MAPPING = {
+        'switzerland': 'schweiz',
+        'austria': 'oesterreich',
+        'france': 'frankreich',
+        'italy': 'italien',
+        'germany': 'deutschland',
+        'slovenia': 'slovenia'
+    }
+    
+    def get_resort_list(self, country='switzerland'):
         """
         Get list of resorts for a country
-        Countries: schweiz, oesterreich, italien, deutschland, frankreich
         """
-        url = f"{self.BASE_URL}/{country}/skigebiete/"
+        country_slug = self.COUNTRY_MAPPING.get(country.lower(), country.lower())
+        url = f"{self.BASE_URL}/{country_slug}/"
         
         html = self.fetch_url(url)
         if not html:
@@ -145,8 +161,18 @@ class BergfexScraper(BaseScraper):
                 else:
                     data['conditions']['status'] = 'partial'
 
-            # 6. Scrape Forecast
-            forecast_data = self.scrape_forecast(resort_url)
+            # 6. Get Forecast
+            # Prefer Open-Meteo if coordinates are available
+            forecast_data = []
+            if 'latitude' in data and 'longitude' in data:
+                print(f"Fetching Open-Meteo forecast for {data.get('name', 'resort')}...")
+                forecast_data = self.weather_service.get_forecast(data['latitude'], data['longitude'])
+            
+            # Fallback to scraping bergfex if Open-Meteo fails or no coordinates
+            if not forecast_data:
+                print(f"Falling back to Bergfex forecast for {resort_url}...")
+                forecast_data = self.scrape_forecast(resort_url)
+                
             if forecast_data:
                 data['forecasts'] = forecast_data
 
