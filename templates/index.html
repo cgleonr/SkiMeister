@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Find nearby ski resorts with real-time snow conditions, prices, and more. SkiMeister helps you discover the best skiing destinations based on your location.">
+    <meta name="keywords" content="ski resorts, snow conditions, ski finder, skiing, snowboarding, ski vacation">
+    <title>SkiMeister - Find Your Perfect Ski Resort</title>
+
+    <!-- Favicon -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎿</text></svg>">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <h1 class="logo">SkiMeister</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="total-resorts">0</span>
+                    <span>Total Resorts</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="nearby-count">0</span>
+                    <span>Nearby</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Filters Section -->
+        <section class="filters">
+            <h2>🔍 Find Your Perfect Resort</h2>
+
+            <div class="filter-grid">
+                <!-- Distance -->
+                <div class="filter-group">
+                    <label for="radius">
+                        📍 Distance
+                        <span class="filter-value" id="radius-value">200 km</span>
+                    </label>
+                    <input type="range" id="radius" min="10" max="500" value="200" step="10">
+                </div>
+
+                <!-- Snow Depth -->
+                <div class="filter-group">
+                    <label for="min-snow">
+                        ❄️ Min Snow Depth
+                        <span class="filter-value" id="min-snow-value">0 cm</span>
+                    </label>
+                    <input type="range" id="min-snow" min="0" max="300" value="0" step="10">
+                </div>
+
+                <!-- Max Price -->
+                <div class="filter-group">
+                    <label for="max-price">
+                        💰 Max Day Pass Price
+                        <span class="filter-value" id="max-price-value">200 CHF</span>
+                    </label>
+                    <input type="range" id="max-price" min="0" max="200" value="200" step="5">
+                </div>
+
+                <!-- Min Open Slopes -->
+                <div class="filter-group">
+                    <label for="min-slopes">
+                        🎿 Min Open Slopes
+                        <span class="filter-value" id="min-slopes-value">0 km</span>
+                    </label>
+                    <input type="range" id="min-slopes" min="0" max="400" value="0" step="10">
+                </div>
+            </div>
+
+            <!-- Country Selection -->
+            <div class="country-selection">
+                <span style="color: var(--text-secondary); font-weight: 600; margin-right: 0.5rem;">🌍 Country:</span>
+                <div class="country-btns">
+                    <button class="country-btn active" data-country="Switzerland">🇨🇭 CH</button>
+                    <button class="country-btn" data-country="Austria">🇦🇹 AT</button>
+                    <button class="country-btn" data-country="France">🇫🇷 FR</button>
+                    <button class="country-btn" data-country="Italy">🇮🇹 IT</button>
+                    <button class="country-btn" data-country="Germany">🇩🇪 DE</button>
+                </div>
+            </div>
+
+            <!-- Sort Controls -->
+            <div class="sort-controls">
+                <span style="color: var(--text-secondary); font-weight: 600; margin-right: 0.5rem;">Sort by:</span>
+                <button class="sort-btn active" data-sort="distance">📍 Distance</button>
+                <button class="sort-btn" data-sort="name">🔤 Name</button>
+                <button class="sort-btn" data-sort="snow">❄️ Snow Depth</button>
+                <button class="sort-btn" data-sort="price">💰 Price</button>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Finding the best ski resorts near you...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">🎿</div>
+            <h2>No resorts found</h2>
+            <p>Try adjusting your filters or increasing the search radius</p>
+        </div>
+
+        <!-- Resorts Grid -->
+        <div id="resorts-grid" class="resorts-grid">
+            <!-- Resort cards will be dynamically inserted here -->
+        </div>
+    </main>
+
+    <!-- Resort Details Modal -->
+    <div id="resort-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-body">
+                <!-- Detailed resort info and forecast will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
